@@ -45,6 +45,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lead form submission handler
+document.getElementById("lead-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const feedback = document.querySelector(".form__feedback");
+
+  const payload = {
+    full_name: document.getElementById("full_name").value,
+    email: document.getElementById("email").value,
+    primary_goal: document.getElementById("primary_goal").value,
+    source: "Idle Toolkit Landing Page"
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+
+    feedback.textContent = "You're in! Check your email for the toolkit.";
+    e.target.reset();
+  } catch (err) {
+    feedback.textContent = err.message || "Something went wrong.";
+  }
+});
+
+
     if (leadForm) {
         leadForm.addEventListener('submit', async (event) => {
             event.preventDefault();
