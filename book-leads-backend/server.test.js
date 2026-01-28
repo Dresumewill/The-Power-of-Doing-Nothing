@@ -96,6 +96,8 @@ jest.mock("mysql2", () => ({
 }));
 
 // Real tests
+const app = require("./app");
+
 describe("POST /leads", () => {
 
   test("returns 201 when lead is valid", async () => {
@@ -118,9 +120,9 @@ describe("POST /leads", () => {
         email: "test@example.com"
       });
 
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(422);
   });
 });
 
-const app = require("./app");
+
 

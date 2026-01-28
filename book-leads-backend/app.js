@@ -16,13 +16,16 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-db.connect(err => {
-  if (err) {
-    console.error("MySQL connection failed:", err);
-    return;
-  }
-  console.log("Connected to MySQL ✅");
-});
+if (process.env.NODE_ENV !== "test") {
+  db.connect((err) => {
+    if (err) {
+      console.error("MySQL connection failed:", err);
+      process.exit(1);
+    }
+    console.log("Connected to MySQL ✅");
+  });
+}
+
 
 // Routes
 const { leadValidationRules } = require("./validators/leadValidator");
