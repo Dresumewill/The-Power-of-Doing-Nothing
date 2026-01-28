@@ -26,3 +26,32 @@ db.connect(err => {
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
+
+app.post("/leads", (req, res) => {
+  const { full_name, email, primary_goal, source } = req.body;
+
+  if (!full_name || !email || !primary_goal) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const sql = `
+    INSERT INTO leads (name, email, goal, source)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.execute(
+    sql,
+    [full_name, email, primary_goal, source || "Landing Page"],
+    (err) => {
+      if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(409).json({ message: "Email already exists" });
+        }
+        console.error(err);
+        return res.status(500).json({ message: "Database error" });
+      }
+
+      res.status(201).json({ message: "Lead saved successfully" });
+    }
+  );
+});
