@@ -23,14 +23,12 @@ db.connect(err => {
   console.log("Connected to MySQL ✅");
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
-
 app.post("/leads", (req, res) => {
-  const { full_name, email, primary_goal, source } = req.body;
+    console.log("REQ BODY =>", req.body);
+  
+    const { full_name, email, primary_goal, source } = req.body;
 
-  if (!full_name || !email || !primary_goal) {
+    if (!full_name || !email || !primary_goal) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -47,7 +45,6 @@ app.post("/leads", (req, res) => {
         if (err.code === "ER_DUP_ENTRY") {
           return res.status(409).json({ message: "Email already exists" });
         }
-        console.error(err);
         return res.status(500).json({ message: "Database error" });
       }
 
@@ -55,3 +52,11 @@ app.post("/leads", (req, res) => {
     }
   );
 });
+
+if (process.env.NODE_ENV !== "test") {
+  app.listen(process.env.PORT, () => {
+    console.log(`Server running on port ${process.env.PORT}`);
+  });
+}
+
+module.exports = app;
