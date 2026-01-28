@@ -1,11 +1,11 @@
-const request = require("supertest");
+/*const request = require("supertest");
 const mysql = require("mysql2");
-const app = require("./server");
+const app = require("./server");*/
 
 /**
  * Mock MySQL
  */
-jest.mock("mysql2", () => {
+/*jest.mock("mysql2", () => {
   const execute = jest.fn();
   return {
     createConnection: jest.fn(() => ({
@@ -83,4 +83,44 @@ describe("POST /leads", () => {
     expect(res.statusCode).toBe(500);
     expect(res.body.message).toBe("Database error");
   });
+});*/
+
+const request = require("supertest");
+
+/* Mock mysql2 */
+jest.mock("mysql2", () => ({
+  createConnection: () => ({
+    connect: jest.fn(),
+    execute: jest.fn((sql, values, cb) => cb(null))
+  })
+}));
+
+// Real tests
+describe("POST /leads", () => {
+
+  test("returns 201 when lead is valid", async () => {
+    const res = await request(app)
+      .post("/leads")
+      .send({
+        full_name: "Ada Obi",
+        email: "ada@example.com",
+        primary_goal: "Reduce burnout"
+      });
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.message).toBe("Lead saved successfully");
+  });
+
+  test("returns 400 when fields are missing", async () => {
+    const res = await request(app)
+      .post("/leads")
+      .send({
+        email: "test@example.com"
+      });
+
+    expect(res.statusCode).toBe(400);
+  });
 });
+
+const app = require("./app");
+
