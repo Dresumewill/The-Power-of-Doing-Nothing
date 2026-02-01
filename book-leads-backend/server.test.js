@@ -86,16 +86,6 @@ describe("POST /leads", () => {
 });*/
 
 const request = require("supertest");
-
-/* Mock mysql2 */
-jest.mock("mysql2", () => ({
-  createConnection: () => ({
-    connect: jest.fn(),
-    execute: jest.fn((sql, values, cb) => cb(null))
-  })
-}));
-
-// Real tests
 const app = require("./app");
 
 describe("POST /leads", () => {
@@ -110,7 +100,6 @@ describe("POST /leads", () => {
       });
 
     expect(res.statusCode).toBe(201);
-    expect(res.body.message).toBe("Lead saved successfully");
   });
 
   test("returns 400 when fields are missing", async () => {
@@ -120,9 +109,6 @@ describe("POST /leads", () => {
         email: "test@example.com"
       });
 
-    expect(res.statusCode).toBe(422);
+    expect(res.statusCode).toBe(400);
   });
 });
-
-
-

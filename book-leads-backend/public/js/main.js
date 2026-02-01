@@ -1,20 +1,37 @@
 console.log("Main JS loaded ✅");
 
-document.getElementById("lead-form").addEventListener("submit", async (e) => {
+const form = document.getElementById("lead-form");
+const feedback = document.querySelector(".form__feedback");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const full_name = document.getElementById("full_name").value;
-  const email = document.getElementById("email").value;
-  const primary_goal = document.getElementById("primary_goal").value;
+  feedback.textContent = "Submitting…";
 
-  const res = await fetch("/leads", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ full_name, email, primary_goal })
-  });
+  const payload = {
+    full_name: document.getElementById("full_name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    primary_goal: document.getElementById("primary_goal").value.trim()
+  };
 
-  const data = await res.json();
+  try {
+    const res = await fetch("/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-  document.querySelector(".form__feedback").textContent =
-    data.message || "Submitted";
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Request failed");
+    }
+
+    feedback.textContent = "✅ Success! Check your email.";
+    form.reset();
+
+  } catch (err) {
+    console.error("FETCH ERROR:", err);
+    feedback.textContent = "Network error. Please try again.";
+  }
 });

@@ -3,8 +3,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const navList = document.querySelector('.nav__list');
     const backToTop = document.getElementById('back-to-top');
     const yearEl = document.getElementById('year');
-    const leadForm = document.getElementById('lead-form');
-    const feedbackEl = document.querySelector('.form__feedback');
+    const form = document.getElementById("lead-form");
+    const feedback = document.querySelector(".form__feedback");
+    // const leadForm = document.getElementById('lead-form');
+    // const feedbackEl = document.querySelector('.form__feedback');
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // ⛔ STOP browser reload
+
+        const full_name = document.getElementById("full_name").value;
+        const email = document.getElementById("email").value;
+        const primary_goal = document.getElementById("primary_goal").value;
+
+        try {
+        const res = await fetch("http://localhost:5000/leads", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                full_name,
+                email,
+                primary_goal,
+                source: "Landing Page"
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            feedback.textContent = data.message || "Submission failed";
+            feedback.style.color = "red";
+            return;
+        }
+
+        feedback.textContent = "✅ Toolkit sent! Check your email.";
+        feedback.style.color = "green";
+        form.reset();
+
+        } catch (err) {
+        console.error("FETCH ERROR =>", err);
+        feedback.textContent = "Network error. Please try again.";
+        feedback.style.color = "red";
+        }
+    });
 
     if (yearEl) {
         yearEl.textContent = new Date().getFullYear();
@@ -45,37 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lead form submission handler
-document.getElementById("lead-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const feedback = document.querySelector(".form__feedback");
-
-  const payload = {
-    full_name: document.getElementById("full_name").value,
-    email: document.getElementById("email").value,
-    primary_goal: document.getElementById("primary_goal").value,
-    source: "Idle Toolkit Landing Page"
-  };
-
-  try {
-    const response = await fetch("http://localhost:5000/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) throw new Error(data.message);
-
-    feedback.textContent = "You're in! Check your email for the toolkit.";
-    e.target.reset();
-  } catch (err) {
-    feedback.textContent = err.message || "Something went wrong.";
-  }
-});
-
-
     if (leadForm) {
         leadForm.addEventListener('submit', async (event) => {
             event.preventDefault();
