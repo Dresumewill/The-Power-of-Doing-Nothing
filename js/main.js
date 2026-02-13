@@ -87,17 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lead form submission handler
-    if (leadForm) {
-        leadForm.addEventListener('submit', async (event) => {
+    if (form) {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!feedbackEl) return;
 
-            const formData = new FormData(leadForm);
+            const formData = new FormData(form);
             const submission = Object.fromEntries(formData.entries());
 
             feedbackEl.textContent = 'Sending your toolkit...';
-            leadForm.classList.add('is-submitting');
-            leadForm.querySelector('button[type="submit"]').disabled = true;
+            form.classList.add('is-submitting');
+            form.querySelector('button[type="submit"]').disabled = true;
 
             try {
                 const response = await fetch('tables/book_leads', {
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(`Request failed: ${response.status}`);
                 }
 
-                leadForm.reset();
+                form.reset();
                 feedbackEl.textContent = "You're on the list! Check your inbox for the toolkit.";
                 feedbackEl.classList.remove('is-error');
                 feedbackEl.classList.add('is-success');
@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 feedbackEl.classList.add('is-error');
                 console.error('Lead form submission error:', error);
             } finally {
-                leadForm.classList.remove('is-submitting');
-                leadForm.querySelector('button[type="submit"]').disabled = false;
+                form.classList.remove('is-submitting');
+                form.querySelector('button[type="submit"]').disabled = false;
             }
         });
     }
